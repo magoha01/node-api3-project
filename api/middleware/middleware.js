@@ -1,5 +1,6 @@
 function logger(req, res, next) {
   // DO YOUR MAGIC
+  console.log(`[${new Date().toISOString()}] ${req.method} to ${req.ur}`)
 }
 
 function validateUserId(req, res, next) {
