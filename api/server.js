@@ -1,18 +1,19 @@
 const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
-const server = express();
+//const morgan = require("morgan");
+//const cors = require("cors");
 const { logger } = require("./middleware/middleware");
-const userRouter = require("./users/users-router");
+const server = express();
+const usersRouter = require("./users/users-router");
 
-// remember express by default cannot parse JSON in request bodies
 server.use(express.json());
-server.use(cors());
-server.use(morgan("tiny"));
-server.use("/api/users", userRouter);
+
+server.use(logger);
+//server.use(cors());
+//server.use(morgan("tiny"));
+server.use("/api/users", usersRouter);
 // global middlewares and the user's router need to be connected here
 
-server.get("/", logger, (req, res) => {
+server.get("/", (req, res) => {
   res.send(`<h2>Let's write some middleware!</h2>`);
 });
 
