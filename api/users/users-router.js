@@ -37,17 +37,23 @@ router.put("/:id", validateUserId, (req, res) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+  console.log(req.user)
 });
 
 router.delete("/:id", validateUserId, (req, res, next) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
+  console.log(req.user);
 });
 
 //this needs a middleware to verify user id
 
-router.get("/:id/posts", validateUserId, (req, res) => {});
+router.get("/:id/posts", validateUserId, (req, res) => {
+  console.log(req.user);
+});
 
-router.post("/:id/posts", validateUserId, (req, res) => {});
+router.post("/:id/posts", validateUserId, (req, res) => {
+  console.log(req.user);
+});
 
 // do not forget to export the router
 module.exports = router;
