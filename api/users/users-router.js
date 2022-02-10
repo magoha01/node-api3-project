@@ -2,8 +2,8 @@ const express = require("express");
 
 const {
   validateUserId,
-  //validateUser,
-  //validatePost,
+  validateUser,
+  validatePost,
 } = require("../middleware/middleware");
 
 // You will need `users-model.js` and `posts-model.js` both
@@ -16,8 +16,8 @@ const router = express.Router();
 router.get("/", (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
   Users.get(req.query)
-    .then((allPosts) => {
-      res.status(200).json(allPosts);
+    .then((allUsers) => {
+      res.status(200).json(allUsers);
     })
     .catch(next);
 });
@@ -28,16 +28,31 @@ router.get("/:id", validateUserId, (req, res) => {
   res.json(req.user);
 });
 
-router.post("/", (req, res) => {
+router.post("/", validateUser, (req, res, next) => {
   // RETURN THE NEWLY CREATED USER OBJECT
   // this needs a middleware to check that the request body is valid
+  Users.insert({ name: req.name })
+    .then((newUser) => {
+      res.status(201).json(newUser);
+    })
+    //UNNECESSARY FUNCTION WRAPPING => THIS IS THE EQUIVALENT OF '.catch(next)'
+    .catch((err) => {
+      next(err);
+    });
 });
 
-router.put("/:id", validateUserId, (req, res) => {
+router.put("/:id", validateUserId, validateUser, (req, res, next) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
-  console.log(req.user)
+  Users.update(req.params.id, { name: req.name })
+    .then(() => {
+      return Users.getById(req.params.id)
+    })
+    .then((user) => {
+      res.json(user)
+    })
+    .catch(next);
 });
 
 router.delete("/:id", validateUserId, (req, res, next) => {
@@ -51,8 +66,16 @@ router.get("/:id/posts", validateUserId, (req, res) => {
   console.log(req.user);
 });
 
-router.post("/:id/posts", validateUserId, (req, res) => {
+router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
   console.log(req.user);
+});
+
+router.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    customMessage: "something bad happened inside posts router",
+    message: err.message,
+    stack: err.stack,
+  });
 });
 
 // do not forget to export the router
